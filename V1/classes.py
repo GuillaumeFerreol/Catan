@@ -18,19 +18,21 @@ class Player:
 
     #Methods (version 3)
         def pass_round(self, user_answer):#Pass the round
-
+                pass
         def roll_dice(self):
             return random.randint(1,6)+random.randint(1,6)
 
         def buy_road(self, user_answer):
+            pass
 
         def buy_settlements(self,user_answer,  regions):
+            pass
 
         def upgrade_settlement(self, user_answer):
-
+            pass
 
         def move_robber(self, region, player_to_steal, resource_to_steal):
-
+            pass
 
         #(Trade with players)
         #(Trade with bank)
@@ -48,57 +50,59 @@ class Region:
         self.name=name
         self.owner={}
         self.robber=0
-    Attributes (version 3)
+    # Attributes (version 3)
 
-        Owner(s) (dictionary with key: player name and value: 0/1 for town/city)
-        Robber 
-        Vertices (initialized as a dictionary [0-5])
-        Edges (initialized as a dictionary [0-5])
-        (Ports)
+    #     Owner(s) (dictionary with key: player name and value: 0/1 for town/city)
+    #     Robber 
+    #     Vertices (initialized as a dictionary [0-5])
+    #     Edges (initialized as a dictionary [0-5])
+    #     (Ports)
 
-    Methods (version 3)
-        Give resources to players
+    # Methods (version 3)
+    #     Give resources to players
 
 
 
 class Road:
 
-    def __init__(self, ):
-    Attributes (version 3)
-        Owner
-        Regions it belongs to 
+    def __init__(self ):
+        pass
+    # Attributes (version 3)
+    #     Owner
+    #     Regions it belongs to 
 
 
-    Methods (version 3)
-        Assign_owner
-        Assign_region
-        Get_owner
-        Get_regions
+    # Methods (version 3)
+    #     Assign_owner
+    #     Assign_region
+    #     Get_owner
+    #     Get_regions
 
 
 
 class Settlement:
 
-    def __init__(self, ):
-    Attributes (version 3)
-        Owner
-        Multiplier (initialized as 1 → becomes 2 when town is upgraded to city)
-        Level (Town or City (initialized as 0 - town))
-        Regions it belongs to
-        (Port(initialized as null))
+    def __init__(self ):
+        pass
+    # Attributes (version 3)
+    #     Owner
+    #     Multiplier (initialized as 1 → becomes 2 when town is upgraded to city)
+    #     Level (Town or City (initialized as 0 - town))
+    #     Regions it belongs to
+    #     (Port(initialized as null))
 
-    Methods (version 3)
-        Pass the round
-        Assign owner
-        Assign multiplayer 
-        Buy roads
-        Buy settlements
+    # Methods (version 3)
+    #     Pass the round
+    #     Assign owner
+    #     Assign multiplayer 
+    #     Buy roads
+    #     Buy settlements
 
 
 
 class Board:
 
-    def __init__(self, ):
+    def __init__(self):
         self.regions_name=('a', 'b', 'c', 'd', 'e', 'f','g', 'h', 'i', 'j', 'k', 'l','m', 'n', 'o', 'p', 'q', 'r','s')
         self.region_position=(k for k in range(0, 19))
         self.resources_list=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]
@@ -108,15 +112,11 @@ class Board:
         self.regions_list=[Region(self.regions_name[k], self.resources_list[k], self.region_position[k] ) for k in range(len(self.regions_name))]
 
 
+        def assign_robber(self):
+            self.region_list[random.randint(0,19)].robber==1
 
-
-
-    Attributes (version 3)
-        Regions (list of regions)
-
-    Methods (version 3)
-        Assign robber
-        show(V2?)
+        
+        #show(V2?)
 
 
 
@@ -127,6 +127,7 @@ class Game:
             self.players={name:Player(name)}
             self.scores=[self.players[player].points for player in self.players]
             self.winning_condition=0
+        self.board=Board()
 
 
         def declare_winner(self, current_player):
@@ -136,6 +137,8 @@ class Game:
 
         def turn(self, player):
             self.dice_result=player.roll_dice()
+            if self.dice_result==7:
+                self.board.assign_robber()
             #give resources to each players
             player.buy_road()
             player.buy_settlements(regions)
