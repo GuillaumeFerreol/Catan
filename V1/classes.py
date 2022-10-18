@@ -23,15 +23,30 @@ class Player:
             return random.randint(1,6)+random.randint(1,6)
 
         def buy_road(self, user_answer):
+            #check resources
+            #ask user yes/no
+            #ask user where
+            #update road, player
             pass
 
         def buy_settlements(self,user_answer,  regions):
+            #check resources
+            #ask user yes/no
+            #ask user where
+            #update region, player
             pass
 
         def upgrade_settlement(self, user_answer):
+            #check resources
+            #ask user yes/no
+            #ask user where
+            #update settlement, player
             pass
 
-        def move_robber(self, region, player_to_steal, resource_to_steal):
+        def move_robber(self):
+            #ask region, player_to_rob, resource_to_rob
+            #update region
+            #update player resources
             pass
 
         #(Trade with players)
@@ -53,9 +68,8 @@ class Region:
     # Attributes (version 3)
 
     #     Owner(s) (dictionary with key: player name and value: 0/1 for town/city)
-    #     Robber 
-    #     Vertices (initialized as a dictionary [0-5])
-    #     Edges (initialized as a dictionary [0-5])
+    #     Vertices (initialized as a dictionary [0-5]) with value [owner, buildable, occupied]?
+    #     Edges (initialized as a dictionary [0-5]) with value [owner, buildable, occupied]?
     #     (Ports)
 
     # Methods (version 3)
@@ -141,9 +155,9 @@ class Game:
                 self.board.assign_robber()
             #give resources to each players
             player.buy_road()
-            player.buy_settlements(regions)
+            player.buy_settlements()
             player.upgrade_settlement()
-            player.move_robber(region, player_to_rob, resource_to_rob)
+            player.move_robber()
 
         def rounds(self):
             while True:
@@ -154,6 +168,8 @@ class Game:
                         break
                     print(f'the scores are {self.scores}')
             print(f'the scores are {self.scores}')
+
+            
                     
 
 
