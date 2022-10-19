@@ -59,12 +59,28 @@ class Player:
 
 class Region:
 
-    def __init__(self, name, resource, position):
+    types_to_resources={'4': 'bricks', '3':'grain', '1':'lumber', '5':'ore', '2':'wool'}  #forest=1 (lumber), pasture=2 (wool), fields=3 (grain), hills=4 (brick), mountain=5 (ore), desert=6 (None)
+
+
+    def __init__(self, name, region_type, position):
         self.position=position
-        self.resource=resource
+        self.region_type=region_type
+        self.resource_type=self.types_to_resources[region_type]
         self.name=name
         self.owner={}
         self.robber=0
+        self.vertices={p: Settlement() for p in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']}
+        self.edges={p: Road() for p in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']}
+
+    def give_resources(self):
+        if self.region_type==6 or self.robber!=0:
+            pass
+
+        for s in self.edges:
+            if s[0]!=None:
+                s[0].resources[self.resource_type]+=1*s[2].multiplier
+
+
     # Attributes (version 3)
 
     #     Owner(s) (dictionary with key: player name and value: 0/1 for town/city)
@@ -79,12 +95,14 @@ class Region:
 
 class Road:
 
-    def __init__(self ):
-        pass
-    # Attributes (version 3)
-    #     Owner
-    #     Regions it belongs to 
+    def __init__(self, *args):
+        self.owner=None
+        self.regions=[name for name in args]
+        self.level=0 #0=empty, 1=road exists
 
+    def assign_owner(self, owner):
+        self.owner=owner
+        self.level=1
 
     # Methods (version 3)
     #     Assign_owner
@@ -96,8 +114,12 @@ class Road:
 
 class Settlement:
 
-    def __init__(self ):
-        pass
+    def __init__(self, *args):
+        self.multiplier=0 #level = multiplier?
+        self.owner=None
+        self.regions=[name for name in args]
+        self.level=0
+        
     # Attributes (version 3)
     #     Owner
     #     Multiplier (initialized as 1 → becomes 2 when town is upgraded to city)
@@ -105,12 +127,17 @@ class Settlement:
     #     Regions it belongs to
     #     (Port(initialized as null))
 
-    # Methods (version 3)
-    #     Pass the round
-    #     Assign owner
-    #     Assign multiplayer 
-    #     Buy roads
-    #     Buy settlements
+    def assign_owner(self, owner)
+        self.owner=owner
+        self.multiplier=1
+        self.level=1
+
+    def upgrade(self):
+        self.level=2
+        self.multiplier=2
+    
+
+
 
 
 
@@ -118,12 +145,12 @@ class Board:
 
     def __init__(self):
         self.regions_name=('a', 'b', 'c', 'd', 'e', 'f','g', 'h', 'i', 'j', 'k', 'l','m', 'n', 'o', 'p', 'q', 'r','s')
-        self.region_position=(k for k in range(0, 19))
-        self.resources_list=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]
-        random.shuffle(self.resources_list)
+        self.region_position=list(range(0, 19))
+        self.region_types=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]
+        random.shuffle(self.region_types)
         random.shuffle(self.region_position)
-        #forest=1, pasture=2, fields=3, hills=4, mountain=5, desert=6
-        self.regions_list=[Region(self.regions_name[k], self.resources_list[k], self.region_position[k] ) for k in range(len(self.regions_name))]
+        #forest=1 (lumber), pasture=2 (wool), fields=3 (grain), hills=4 (brick), mountain=5 (ore), desert=6 (None)
+        self.regions_list=[Region(self.regions_name[k], self.region_types[k], self.region_position[k] ) for k in range(len(self.regions_name))]
 
 
         def assign_robber(self):
