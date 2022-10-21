@@ -8,11 +8,9 @@ import random
 class Player:
     def __init__(self, name):
         self.name=name
-        self.resources ={'brick': 0, 'grain':0, 'lumber': 0, 'ore':0, 'wool':0} #Resources (initialized as 0)
-        self.regions = [] #Regions (initialized as 0)
+        self.resources ={'brick': 0, 'grain':0, 'lumber': 0, 'ore':0, 'wool':0} #Resources (initialized as 0) 
         self.points=0
         self.settlements=[]
-        self.cities=[]
         self.roads=[]
         #(Ports)
 
@@ -22,23 +20,20 @@ class Player:
         def roll_dice(self):
             return random.randint(1,6)+random.randint(1,6)
 
-        def buy_road(self, user_answer):
+        def buy_road(self, road):
             #check resources
-            #ask user yes/no
-            #ask user where
+
             #update road, player
             pass
 
-        def buy_settlements(self,user_answer,  regions):
+        def buy_settlements(self,  settlement):
             #check resources
-            #ask user yes/no
             #ask user where
             #update region, player
             pass
 
-        def upgrade_settlement(self, user_answer):
+        def upgrade_settlement(self, settlement):
             #check resources
-            #ask user yes/no
             #ask user where
             #update settlement, player
             pass
@@ -63,16 +58,15 @@ class Region:
     types_to_resources={'4': 'bricks', '3':'grain', '1':'lumber', '5':'ore', '2':'wool'}  #forest=1 (lumber), pasture=2 (wool), fields=3 (grain), hills=4 (brick), mountain=5 (ore), desert=6 (None)
     
 
-    def __init__(self, name,dice_number, region_type, position, coordinates):
-        self.position=position
+    def __init__(self, id,dice_number, region_type,  coordinates):
         self.coordinates=coordinates
         self.region_type=region_type
         self.resource_type=self.types_to_resources[region_type]
-        self.name=name
+        self.id=id
         self.dice_number=dice_number
         self.robber=0
-        self.vertices={p: Settlement() for p in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']}
-        self.edges={p: Road() for p in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']}
+        self.vertices={p:  vertex_object for p in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']}
+        self.edges={p: edge_object for p in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']}
 
     def give_resources(self):
         if self.region_type==6 or self.robber!=0:
@@ -140,27 +134,6 @@ class Settlement:
         self.multiplier=2
 
 
-class Settlement_Location:
-
-    def __init__(self, position):
-        self.coordinates=some_function(position)
-        self.settlement=None
-
-
-
-    def assign_settlement(self, settlement):
-        self.settlement=settlement
-
-class Road_Location:
-
-    def __init__(self, position):
-        self.coordinates=some_function(position)
-        self.road=None
-
-
-
-    def assign_settlement(self, road):
-        self.road=road
 
 
     
@@ -172,21 +145,29 @@ class Board:
     def __init__(self):
         
         self.region_position=tuple(range(0, 19))
-        self.region_types=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]
+        self.region_types=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]#desert needs to have 7 
         random.shuffle(self.region_types)
         #forest=1 (lumber), pasture=2 (wool), fields=3 (grain), hills=4 (brick), mountain=5 (ore), desert=6 (None)
 
         self.region_coordinates={'1': (2,0,0), '2': (1,0,1), '3':(0,2,0), '4':(0,1,1), '5': (0,2,0), '6':(-1,1,0), '7':(-2,0,0), '8':(-1,0,-1), '9':(0,0,-2), 
                                 '10': (0,-1,-1), '11': (-2,0,0), '12': (1,-1,0), '13':(1,0,0), '14':(0,0,1), '15': (0,1,0), '16':(-1,0,0), '17':(0,0,-1), 
-                                '18':(0,-1,0), '19':(0,0,0)}
-        self,region_name=(('a',5) , ('b',2) , ('c',6), ('d',3), ('e',8), ('f',10), ('g',9), ('h',12), ('i',11), 
+                                '18':(0,-1,0), '19':(0,0,0)} #change
+
+                                #1 =  (-1;-√3) 2 = (0;-√3),3 = (1;-√3),4 = (3.5;-√3/4),5 = (2;0),6 = (3.5;√3/4),7 = (1;√3),8 = (0;√3), 9 =  (-1;√3),10 = (-3.5;√3/4),
+                                # 11 = (-2;0),12 = (-3.5;-√3/4),13 = (-0.5;-√3/4),14 = (0.5;-√3/4), 15 = (11;0), 16 = (0.5;√3/4), 17 = (-0.5;√3/4), 18 = (-1;0), 19 = (0;0)
+
+        self,region_numbering=(('a',5) , ('b',2) , ('c',6), ('d',3), ('e',8), ('f',10), ('g',9), ('h',12), ('i',11), 
                             ('j',4), ('k',8), ('l',10), ('m',9), ('n',4), ('o',5), ('p',6), ('q',3), ('r',11))
-        self.regions_list=[Region(self.region_name[k][0], self.region_name[k][1], self.region_types[k], 
-                                    self.region_position[k], self.region_coordinates(str(self.region_position[k])) ) for k in range(len(self.regions_name))]
-
-
+        
         def assign_robber(self):
             self.region_list[random.randint(0,19)].robber==1
+
+        def setup_board(self):
+
+            self.regions_list=[Region(self.region_numbering[k][0], self.region_numbering[k][1], self.region_types[k], 
+                                     self.region_coordinates(str(self.region_position[k])) ) for k in range(len(self.regions_name))]
+
+
 
         
         #show(V2?)
