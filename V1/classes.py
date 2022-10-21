@@ -65,8 +65,8 @@ class Region:
         self.id=id
         self.dice_number=dice_number
         self.robber=0
-        self.vertices={p:  vertex_object for p in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']}
-        self.edges={p: edge_object for p in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']}
+        self.vertices={p:  None for p in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']}
+        self.edges={p: None for p in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']}
 
     def give_resources(self):
         if self.region_type==6 or self.robber!=0:
@@ -75,6 +75,12 @@ class Region:
         for s in self.vertices:
             if s[0]!=None:
                 s[0].resources[self.resource_type]+=1*s[2].multiplier
+
+    def assign_vertex(self, vertex)
+        pass
+
+    def assign_edge(self, edge):
+        pass
 
 
     # Attributes (version 3)
