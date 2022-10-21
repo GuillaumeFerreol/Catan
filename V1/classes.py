@@ -161,13 +161,10 @@ class Board:
 
         self.region_numbering=(('a',5) , ('b',2) , ('c',6), ('d',3), ('e',8), ('f',10), ('g',9), ('h',12), ('i',11), 
                             ('j',4), ('k',8), ('l',10), ('m',9), ('n',4), ('o',5), ('p',6), ('q',3), ('r',11))
-        self.roads={}
-        self.settlements={}
         self.regions=[]
         self.proximity_vector={(-0.5,-sqrt(3/4)):(('v5', 'v4', 'e4'), ('v2', 'v1', 'e1')), 
                                 (0.5,-sqrt(3/4)):(('v4', 'v3', 'e3'), ('v1', 'v6', 'e6')), 
-                                (1,0):(('v3', 'v2', 'e2'), ('v6', 'v5', 'e5'))} #change
-                                #(0.5,sqrt(3/4)):(('v2', 'v1', 'e1'), ), (-0.5,sqrt(3/4)):(('v1', 'v6', 'e6'), ), (-1,0):(('v6', 'v5', 'e5'), )
+                                (1,0):(('v3', 'v2', 'e2'), ('v6', 'v5', 'e5'))} 
         
     def assign_robber(self):
         self.region_list[random.randint(0,19)].robber==1
