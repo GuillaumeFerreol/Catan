@@ -172,44 +172,44 @@ class Board:
     def setup_roads_settlements(self, region1, region2):
         vector=region1.coordinates[0]-region2.coordinates[0], region1.coordinates[1]-region2.coordinates[1]
         if vector in self.proximity_vector:
-            if self.proximity_vector[vector][1][2]==None:
-                region1.edges[self.proximity_vector[vector][0][2]]=Road(region1.id, region2.id).regions
-                region2.edges[self.proximity_vector[vector][1][2]]=region1.edges[self.proximity_vector[vector][0][2]]
+            if region2.edges[self.proximity_vector[vector][1][2]]==None:
+                region1.edges[self.proximity_vector[vector][0][2]]=Road(region1.id, region2.id)
+                region2.edges[self.proximity_vector[vector][1][2]]=region1.edges[self.proximity_vector[vector][0][2]] #adding the already created road to the other region
             else:
-                region2.edges[self.proximity_vector[vector][1][2]].append(region1.id)
+                region2.edges[self.proximity_vector[vector][1][2]].regions.append(region1.id) #appending a region id to road.region which is a list containing all regions sharing that edge
                 region1.edges[self.proximity_vector[vector][0][2]]=region2.edges[self.proximity_vector[vector][1][2]]
 
-            if self.proximity_vector[vector][1][0]==None:
-                region1.vertices[self.proximity_vector[vector][0][0]]=Settlement(region1.id, region2.id).regions
+            if region2.vertices[self.proximity_vector[vector][1][0]]==None:
+                region1.vertices[self.proximity_vector[vector][0][0]]=Settlement(region1.id, region2.id)
                 region2.vertices[self.proximity_vector[vector][1][0]]=region1.vertices[self.proximity_vector[vector][0][0]]
             else:
-                region2.vertices[self.proximity_vector[vector][1][0]].append(region1.id)
+                region2.vertices[self.proximity_vector[vector][1][0]].regions.append(region1.id)
                 region1.vertices[self.proximity_vector[vector][0][0]]=region2.vertices[self.proximity_vector[vector][1][0]]
 
-            if self.proximity_vector[vector][1][1]==None:
-                region1.vertices[self.proximity_vector[vector][0][1]]=Settlement(region1.id, region2.id).regions
+            if region2.vertices[self.proximity_vector[vector][1][1]]==None:
+                region1.vertices[self.proximity_vector[vector][0][1]]=Settlement(region1.id, region2.id)
                 region2.vertices[self.proximity_vector[vector][1][1]]=region1.vertices[self.proximity_vector[vector][0][1]]
             else:
-                region2.vertices[self.proximity_vector[vector][1][1]].append(region1.id)
+                region2.vertices[self.proximity_vector[vector][1][1]].regions.append(region1.id)
                 region1.vertices[self.proximity_vector[vector][1][0]]=region2.vertices[self.proximity_vector[vector][1][1]]
 
 
-        if -vector in self.proximity_vector:
-            if self.proximity_vector[-vector][1][2]==None:
+        if -vector in self.proximity_vector: #to check the opposite vectors of the three vectors in the proximity vectors
+            if region2.edges[self.proximity_vector[-vector][1][2]]==None:
                 region1.edges[self.proximity_vector[-vector][0][2]]=Road(region1.id, region2.id).regions
                 region2.edges[self.proximity_vector[-vector][1][2]]=region1.edges[self.proximity_vector[-vector][0][2]]
             else:
                 region2.edges[self.proximity_vector[-vector][1][2]].append(region1.id)
                 region1.edges[self.proximity_vector[-vector][0][2]]=region2.edges[self.proximity_vector[-vector][1][2]]
 
-            if self.proximity_vector[-vector][1][0]==None:
+            if region2.vertices[self.proximity_vector[-vector][1][0]]==None:
                 region1.vertices[self.proximity_vector[-vector][0][0]]=Settlement(region1.id, region2.id).regions
                 region2.vertices[self.proximity_vector[-vector][1][0]]=region1.vertices[self.proximity_vector[-vector][0][0]]
             else:
                 region2.vertices[self.proximity_vector[-vector][1][0]].append(region1.id)
                 region1.vertices[self.proximity_vector[-vector][0][0]]=region2.vertices[self.proximity_vector[-vector][1][0]]
 
-            if self.proximity_vector[-vector][1][1]==None:
+            if region2.vertices[self.proximity_vector[-vector][1][1]]==None:
                 region1.vertices[self.proximity_vector[-vector][0][1]]=Settlement(region1.id, region2.id).regions
                 region2.vertices[self.proximity_vector[-vector][1][1]]=region1.vertices[self.proximity_vector[-vector][0][1]]
             else:
@@ -226,13 +226,10 @@ class Board:
             self.regions.append(Region(self.region_numbering[k][0], self.region_numbering[k][1], self.region_types[k], 
         self.region_coordinates(str(self.region_position[k]))))
 
-        for p in self.regions:
+        for p in self.regions: #creating all inner roads and settlements and assigning them to the relative regions
             for q in self.regions:
-                if p is q:
-                    continue
                 self.setup_roads_settlements(p,q)
-        
-        self.regions=Region.instances
+        # create outer roads and settlements and assign them to the respective region
         self.roads=Road.instances
         self.settlements=Settlement.instances
         
@@ -249,7 +246,7 @@ class Game:
             self.winning_condition=0
         self.board=Board()
 
-
+        #fix indentation
         def declare_winner(self, current_player):
                 if self.players[current_player].points>10:
                     print(f'player {current_player} wins the game !')
@@ -274,6 +271,8 @@ class Game:
                         break
                     print(f'the scores are {self.scores}')
             print(f'the scores are {self.scores}')
+
+    #add method start to recall previous related methods
 
             
                     
