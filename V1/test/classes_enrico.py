@@ -267,17 +267,6 @@ class Board:
     #                 p.connected_roads.append(region1.edges['e1'], region1.edges['e3'], region2.edges['e6'], region1.edges['e4'])
     #                 p.connected_settlements.append(region1.vertices['v3'], region1.vertices['v2'])
     # #call 2 times inverting region1 and region2
-
-
-
-
-
-        
-
-
-
-        self.roads=Road.instances
-        self.settlements=Settlement.instances
         
         #show(V2?)
 
