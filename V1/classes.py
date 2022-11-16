@@ -181,6 +181,15 @@ class Board:
                                 (-1,0):(('v6', 'v5', 'e5'),('v2', 'v3', 'e2'))} 
         self.edge_coordinate_mapping={'e1':(0.25, sqrt(3/4)/2),'e2':(1/2, 0), 'e3':(0.25, -sqrt(3/4)/2), 'e4':(-0.25, -sqrt(3/4)/2), 'e5':(-1/2, -0), 'e6':(-0.25, sqrt(3/4)/2)}
         self.vertex_coordinate_mapping={'v1':(0, 1/sqrt(3)),'v2':(1/2, 1/(2*sqrt(3))), 'v3':(1/2, -1/(2*sqrt(3))), 'v4':(0, -1/sqrt(3)), 'v5':(-1/2, -1/(2*sqrt(3))), 'v6':(-1/2, 1/(2*sqrt(3)))}
+        self.connection_vertices_vertices={'v1':('v6', 'v2'),'v2':('v1', 'v3'),'v3':('v2', 'v4'),
+                                            'v4':('v3', 'v5'),'v5':('v4', 'v6'),'v6':('v5', 'v1')}
+        self.connection_vertices_edges={'v1':('e6', 'e1'),'v2':('e1', 'e2'),'v3':('e2', 'e3'),
+                                            'v4':('e3', 'e4'),'v5':('e4', 'e5'),'v6':('e5', 'e6')}
+        self.connection_edges_vertices={'e1':('v1', 'v2'),'e2':('v2', 'v3'),'e3':('v3', 'v4'),
+                                            'e4':('v4', 'v5'),'e5':('v5', 'v6'),'e6':('v6', 'v1')}
+        self.connection_edges_edges={'e1':('e6', 'e2'),'e2':('e1', 'e3'),'e3':('e2', 'e4'),
+                                            'e4':('e3', 'e5'),'e5':('e4', 'e6'),'e6':('e5', 'e1')}
+        
 
         
     def assign_robber(self):
@@ -225,6 +234,27 @@ class Board:
                 region2.vertices[self.proximity_vector[self.vector][1][1]]=region1.vertices[self.proximity_vector[self.vector][0][1]]
 
 
+    def connections(self): 
+        for region in self.regions:
+            for v in region.vertices:
+                for k in [0,1]:
+                    if region.vertices[self.connection_vertices_vertices[v][k]] not in region.vertices[v].connected_settlements:
+                        region.vertices[v].connected_settlements.append(region.vertices[self.connection_vertices_vertices[v][k]])
+                    if region.edges[self.connection_vertices_edges[v][k]] not in region.vertices[v].connected_roads:
+                        region.vertices[v].connected_roads.append(region.edges[self.connection_vertices_edges[v][k]])
+
+            for v in region.edges:
+                for k in [0,1]:
+                    if region.edges[self.connection_edges_edges[v][k]] not in region.edges[v].connected_roads:
+                        region.edges[v].connected_roads.append(region.edges[self.connection_edges_edges[v][k]])
+                    if region.vertices[self.connection_edges_vertices[v][k]] not in region.edges[v].connected_settlements:
+                        region.edges[v].connected_settlements.append(region.vertices[self.connection_edges_vertices[v][k]])  
+                        
+                    
+                    
+
+
+
     def setup_board(self):
 
         for k in range(0,19):
@@ -238,37 +268,21 @@ class Board:
 
         self.k=0
         for p in self.regions:
-            for q in self.edge_coordinate_mapping.keys():
+            for q in self.edge_coordinate_mapping:
                 if p.edges[q]==None:
                     p.edges[q]=Road(tuple(np.array(p.coordinates)+np.array(self.edge_coordinate_mapping[q])),p.id)
                     self.roads.append(p.edges[q]) #adding the newly created road to the list of roads      
-            for q in self.vertex_coordinate_mapping.keys():
+            for q in self.vertex_coordinate_mapping:
                 if p.vertices[q]==None:
                     self.k+=1
                     p.vertices[q]=Settlement(tuple(np.array(p.coordinates)+np.array(self.vertex_coordinate_mapping[q])),p.id) 
                     self.settlements.append(p.vertices[q])#adding the newly created settlement to the list of settlements
+        self.connections()
 
 
 
 
     
-    # def connections(self, region1, region2): 
-    #     for p in region1.edges.values:
-    #         if p.regions==[region1, region2]:
-    #             vector=region1.coordinates[0]-region2.coordinates[0], region1.coordinates[1]-region2.coordinates[1]
-    #             if vector == (-0.5,-sqrt(3/4)):
-    #                 p.connected_roads.append(region1.edges['e3'], region1.edges['e5'], region2.edges['e6'], region1.edges['e2'])
-    #                 p.connected_settlements.append(region1.vertices['v5'], region1.vertices['v4'])
-    #             if vector == (0.5,-sqrt(3/4)):
-    #                 p.connected_roads.append(region1.edges['e4'], region1.edges['e2'], region2.edges['e5'], region1.edges['e1'])
-    #                 p.connected_settlements.append(region1.vertices['v4'], region1.vertices['v3'])                
-    #             if vector == (1,0):
-    #                 p.connected_roads.append(region1.edges['e1'], region1.edges['e3'], region2.edges['e6'], region1.edges['e4'])
-    #                 p.connected_settlements.append(region1.vertices['v3'], region1.vertices['v2'])
-    # #call 2 times inverting region1 and region2
-        
-        #show(V2?)
-
 
 
 class Game:
@@ -309,4 +323,12 @@ class Game:
     #add method start to recall previous related methods
 
             
-                
+                    
+
+
+
+
+
+
+
+
