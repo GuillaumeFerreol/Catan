@@ -8,7 +8,7 @@ import random
 class Player:
     def __init__(self, name, settlements, roads):
         self.name=name
-        self.resources ={'brick': 0, 'grain':0, 'lumber': 0, 'ore':0, 'wool':0} #Resources (initialized as 0) 
+        self.resources ={'brick': 20, 'grain':20, 'lumber': 20, 'ore':20, 'wool':20} #Resources (initialized as 0) 
         self.points=0
         self.settlements=[]
         self.roads=[]
@@ -49,8 +49,6 @@ class Player:
 
 
 
-
-
 class Robber:
     def __init__(self):
         self.region=None
@@ -75,8 +73,6 @@ class Region:
     
 
 
-
-
 class Road:
 
     def __init__(self,coordinates, *args):
@@ -88,11 +84,8 @@ class Road:
 
 
 
-
-
 class Settlement:
 
-    #each player has X settlements and Y roads at the beggining
     def __init__(self,coordinates, *args):
         self.multiplier=0 
         self.owner=None
@@ -106,11 +99,6 @@ class Settlement:
         self.multiplier=2
 
 
-
-
-
-
-    
 
 
 
@@ -321,7 +309,6 @@ class Board:
 
 
 
-
 class Game:
 
     def __init__(self, board, GUI):
@@ -355,7 +342,6 @@ class Game:
         self.give_resources_round0()
 
 
-
         
     def buy_settlement(self):
         self.GUI.show_buttons_settlements(round=0)
@@ -372,7 +358,6 @@ class Game:
                 if self.winning_condition!=0:
                     return None
         
-
 
 
     def turn_zero(self, player):

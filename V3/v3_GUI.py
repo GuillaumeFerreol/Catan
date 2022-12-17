@@ -13,8 +13,6 @@ from v3_classes.classes import *
 
 
 
-
-
 class GUI:
     def __init__(self):
         self.board=Board()
@@ -24,14 +22,14 @@ class GUI:
         self.var_end_turn=tk.IntVar()
         self.round=0
         
-        self.frame = tk.LabelFrame(self.master, text = "Coords Here", relief = tk.FLAT)
+        self.frame = tk.LabelFrame(self.master,relief = tk.FLAT)
         self.frame.grid(sticky = tk.NSEW)
 
         self.map = tk.Canvas(
             self.frame, 
             highlightthickness = 0, background = "dodgerblue",
-            width = 1000, height = 1000, takefocus = 1,
-            scrollregion = "-500 -500 500 500")
+            width = 1200, height = 1000, takefocus = 1,
+            scrollregion = "-600 -500 600 500")
         self.map.grid(sticky = tk.NSEW, row=0, column=0)
 
 
@@ -132,7 +130,7 @@ class GUI:
         self.map.create_image(region.coordinates[0]*self.rescale, region.coordinates[1]*self.rescale, image = self.resource_type[region])
         self.map.create_image(region.coordinates[0]*self.rescale, region.coordinates[1]*self.rescale, image = self.number[region])
         self.button_robber[region]= ttk.Button(self.map, text='move here',command=lambda : self.move_robber(region))
-        self.button_robber[region].place(in_=self.map, x=region.coordinates[0]*self.rescale+480, y=region.coordinates[1]*self.rescale+480)
+        self.button_robber[region].place(in_=self.map, x=region.coordinates[0]*self.rescale, y=region.coordinates[1]*self.rescale)
         self.button_robber[region].place_forget()
     
 
@@ -140,22 +138,22 @@ class GUI:
     def create_button_vertices(self, settlement, city):
         if city==0:
             self.button_settlement[settlement]=ttk.Button(self.map ,text='set',command=lambda : self.place_settlement(settlement))
-            self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+480, y=settlement.coordinates[1]*self.rescale+480)
+            self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale, y=settlement.coordinates[1]*self.rescale)
             self.button_settlement[settlement].place_forget()
         if city==1:
             self.button_city[settlement]=ttk.Button(self.map ,text='city',command=lambda : self.place_city(settlement))
-            self.button_city[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+480, y=settlement.coordinates[1]*self.rescale+480)
+            self.button_city[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale, y=settlement.coordinates[1]*self.rescale+480)
             self.button_city[settlement].place_forget()
 
     def create_button_edges(self, road):
         self.button_road[road]=ttk.Button(self.map,text='road',command=lambda : self.place_road(road))
-        self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale+480, y=road.coordinates[1]*self.rescale+480)
+        self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale, y=road.coordinates[1]*self.rescale)
         self.button_road[road].place_forget()
 
 
     def show_buttons_robber(self):
         for region in self.button_robber:
-            self.button_robber[region].place(in_=self.map, x=region.coordinates[0]*self.rescale+480, y=region.coordinates[1]*self.rescale+480)
+            self.button_robber[region].place(in_=self.map, x=region.coordinates[0]*self.rescale+570, y=region.coordinates[1]*self.rescale+480)
             self.button_robber[region].state(['!disabled'])
         self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
     
@@ -166,7 +164,7 @@ class GUI:
         if round==0:
             self.board.round0_available_settlements(self.game.players[self.current_player])
             for settlement in self.game.players[self.current_player].available_settlements:#change to available button settlements
-                self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+480, y=settlement.coordinates[1]*self.rescale+480)
+                self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+570, y=settlement.coordinates[1]*self.rescale+480)
             self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
         else:
             self.board.round_available_settlements(self.game.players[self.current_player])
@@ -174,7 +172,7 @@ class GUI:
             and self.game.players[self.current_player].resources['wool']>0 and self.game.players[self.current_player].resources['lumber']>0):   
                 if len(self.game.players[self.current_player].available_settlements)!=0:
                     for settlement in self.game.players[self.current_player].available_settlements:#change to available button settlements
-                        self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+480, y=settlement.coordinates[1]*self.rescale+480)
+                        self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+570, y=settlement.coordinates[1]*self.rescale+480)
                     self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
                 else:
                     self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
@@ -191,14 +189,14 @@ class GUI:
         if round==0:
             self.board.round0_available_roads(self.game.players[self.current_player])
             for road in self.game.players[self.current_player].available_roads:
-                    self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale+480, y=road.coordinates[1]*self.rescale+480)
+                    self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale+570, y=road.coordinates[1]*self.rescale+480)
             self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
         else:
             self.board.round_available_roads(self.game.players[self.current_player])
             if self.game.players[self.current_player].resources['brick']>0 and self.game.players[self.current_player].resources['lumber']>0:
                 if len(self.game.players[self.current_player].available_roads)!=0:
                     for road in self.game.players[self.current_player].available_roads:
-                        self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale+480, y=road.coordinates[1]*self.rescale+480)
+                        self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale+570, y=road.coordinates[1]*self.rescale+480)
                     self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
                 else:
                     self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
@@ -216,7 +214,7 @@ class GUI:
         if self.game.players[self.current_player].resources['ore']>2 and self.game.players[self.current_player].resources['grain']>1:
             for settlement in self.game.players[self.current_player].settlements:
                     if settlement.multiplier==1:
-                        self.button_city[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+480, y=settlement.coordinates[1]*self.rescale+480)
+                        self.button_city[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+570, y=settlement.coordinates[1]*self.rescale+480)
             self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button, self.end_action_button)
         else:
             self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button)
@@ -272,8 +270,9 @@ class GUI:
 
 
     def display_winner(self, winner):
-        self_winner=Label(self.panel, text=f'THE WINNER IS {winner}', background = "wheat")
-        self.dice.place(in_=self.panel, x=200, y=300)
+        self.winner=Label(self.panel, text=f'THE WINNER IS {winner}', background = "wheat")
+        self.winner.place(in_=self.panel, x=150, y=700)
+        self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button, self.end_action_button)
 
     def setup_panel(self):
         self.place_robber=ttk.Button(self.panel, text='MOVE ROBBER',command=self.show_buttons_robber )
@@ -298,7 +297,7 @@ class GUI:
         self.player_resources.place(in_=self.panel, x=50, y=520)
 
         self.dice=ttk.Label(self.panel, text='dice roll:', background = "wheat")
-        self.dice.place(in_=self.panel, x=200, y=200)
+        self.dice.place(in_=self.panel, x=300, y=50)
 
 
     def setup_map(self):
@@ -316,16 +315,9 @@ class GUI:
         self.robber_image=self.map.create_image(self.board.robber.region.coordinates[0]*self.rescale, self.board.robber.region.coordinates[1]*self.rescale, image = self.robber)
         
 
-    def rowcol(self, event):
-        self.frame["text"] = f"{self.map.canvasx(event.x)} | {self.map.canvasy(event.y)}"
-
-
-
 
     def build_GUI(self):
-       # self.map.bind("<Motion>", self.rowcol)
         self.master.mainloop()
-
 
 
 

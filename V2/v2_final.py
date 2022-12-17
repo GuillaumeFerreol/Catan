@@ -307,46 +307,9 @@ class Game:
             self.board=board
         self.GUI=GUI
 
-    #fix indentation
-    def declare_winner(self, current_player):
-            if self.players[current_player].points>10:
-                print(f'player {current_player} wins the game !')
-                return 1
 
 
 
-    def turn(self, player):
-        self.dice_result= random.randint(1,6)+random.randint(1,6)
-        self.end_turn=0
-        while self.end_turn==0:
-            if self.dice_result==7:
-                pass
-            player.buy_road()
-            player.buy_settlements()
-            player.upgrade_settlement()
-        
-    def give_resources(self):
-        pass
-
-    def round_zero(self):
-        #for player in self.players:
-        pass   
-            
-
-
-
-    def rounds(self):
-        while True:
-            for player in self.players:
-                turn(self.players[player])
-                self.winning_condition=declare_winner(player)
-                if self.winning_condition!=0:
-                    break
-                print(f'the scores are {self.scores}')
-        print(f'the scores are {self.scores}')
-
-    
-    #add method start to recall previous related methods
 
 
 class GUI:
@@ -380,7 +343,7 @@ class GUI:
         self.button_road=dict()
 
 
-        self.robber = PhotoImage(file="PNGs/PNGs/Additional_elements/robber.png")
+        self.robber = PhotoImage(file="V2/PNGs/Additional_elements/robber.png")
 
         
 
@@ -388,13 +351,13 @@ class GUI:
         self.start_button.place(in_=self.panel,x=200,y=450, height=100, width=100 )
 
 
-        self.robber = PhotoImage(file="PNGs/PNGs/Additional_elements/robber.png")
+        self.robber = PhotoImage(file="V2/PNGs/Additional_elements/robber.png")
         for player in self.game.players:
-            self.game.players[player].image_roads.append(PhotoImage(file=f"PNGs/PNGs/builds/{ self.game.players[player].name}/road1.png"))
-            self.game.players[player].image_roads.append(PhotoImage(file=f"PNGs/PNGs/builds/{ self.game.players[player].name}/road2.png"))
-            self.game.players[player].image_roads.append(PhotoImage(file=f"PNGs/PNGs/builds/{ self.game.players[player].name}/road3.png"))
-            self.game.players[player].image_city = PhotoImage(file=f"PNGs/PNGs/builds/{ self.game.players[player].name}/city.png")
-            self.game.players[player].image_settlement=PhotoImage(file=f"PNGs/PNGs/builds/{ self.game.players[player].name}/colony.png")
+            self.game.players[player].image_roads.append(PhotoImage(file=f"V2/PNGs/builds/{ self.game.players[player].name}/road1.png"))
+            self.game.players[player].image_roads.append(PhotoImage(file=f"V2/PNGs/builds/{ self.game.players[player].name}/road2.png"))
+            self.game.players[player].image_roads.append(PhotoImage(file=f"V2/PNGs/builds/{ self.game.players[player].name}/road3.png"))
+            self.game.players[player].image_city = PhotoImage(file=f"V2/PNGs/builds/{ self.game.players[player].name}/city.png")
+            self.game.players[player].image_settlement=PhotoImage(file=f"V2/PNGs/builds/{ self.game.players[player].name}/colony.png")
 
 
         self.road_rotation={(0.25, round(sqrt(3/4)/2,10)): 1, (1/2, 0): 0, (0.25, round(-sqrt(3/4)/2,10)): 2, (-0.25, round(-sqrt(3/4)/2,10)): 1, (-1/2, -0): 0, (-0.25, round(sqrt(3/4)/2,10)): 2}
@@ -409,12 +372,11 @@ class GUI:
         self.number=dict()
         for region in self.board.regions:
 
-            self.resource_type[region]=ImageTk.PhotoImage(Image.open(f"PNGs/PNGs/Resources/{region.resource_type}.png").resize((200,226)))
-            self.number[region] = ImageTk.PhotoImage(Image.open(f"PNGs/PNGs/Numbers/{region.dice_number}.png").resize((220,249)))
+            self.resource_type[region]=ImageTk.PhotoImage(Image.open(f"V2/PNGs/Resources/{region.resource_type}.png").resize((200,226)))
+            self.number[region] = ImageTk.PhotoImage(Image.open(f"V2/PNGs/Numbers/{region.dice_number}.png").resize((220,249)))
         self.setup_map()
         self.setup_panel()
-        #self.game.
-        #self.game.rounds()
+
 
 
 
@@ -426,14 +388,14 @@ class GUI:
         for x in self.button_robber.values():
             x.state(['disabled'])
             x.place_forget()
-        self.enable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)
+        self.enable_button(self.place_robber)
 
     def place_settlement(self,settlement, player=None):
         self.settlement_image=self.game.players['player1'].image_settlement
         self.map.create_image(settlement.coordinates[0]*self.rescale, settlement.coordinates[1]*self.rescale, image = self.settlement_image)
         for x in self.button_settlement.values():
             x.place_forget()
-        self.enable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)
+        self.enable_button(self.place_robber)
 
     def place_road(self, road, player=None):
         self.vector=(round(road.coordinates[0]-road.regions[0].coordinates[0],10), round(road.coordinates[1]-road.regions[0].coordinates[1],10) )
@@ -441,7 +403,7 @@ class GUI:
         self.map.create_image(road.coordinates[0]*self.rescale, road.coordinates[1]*self.rescale, image = self.road_image)
         for x in self.button_road.values():
             x.place_forget()
-        self.enable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)       
+        self.enable_button(self.place_robber)       
 
 
 
@@ -467,17 +429,17 @@ class GUI:
         for region in self.button_robber:
             self.button_robber[region].place(in_=self.map, x=region.coordinates[0]*self.rescale+480, y=region.coordinates[1]*self.rescale+480)
             self.button_robber[region].state(['!disabled'])
-        self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)
+        self.disable_button(self.place_robber)
     
     def show_buttons_settlements(self):
         for settlement in self.button_settlement:#change to available button settlements
             self.button_settlement[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale+480, y=settlement.coordinates[1]*self.rescale+480)
-        self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)
+        self.disable_button(self.place_robber)
 
     def show_buttons_roads(self):
         for road in self.button_road:
             self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale+480, y=road.coordinates[1]*self.rescale+480)
-        self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)
+        self.disable_button(self.place_robber)
     
     def disable_button(self, *args):
         for button in args:
@@ -490,19 +452,7 @@ class GUI:
 
     def setup_panel(self):
         self.place_robber=ttk.Button(self.panel, text='MOVE ROBBER',command=self.show_buttons_robber )
-        self.place_robber.place(in_=self.panel, x=50, y=200)
-        self.buy_road=ttk.Button(self.panel, text='BUY ROAD',command=self.show_buttons_roads)
-        self.buy_road.place(in_=self.panel, x=50, y=50)
-        self.buy_settlement=ttk.Button(self.panel, text='BUY SETTLEMENT',command=self.show_buttons_settlements )
-        self.buy_settlement.place(in_=self.panel, x=50, y=100)
-        self.up_settlement=ttk.Button(self.panel, text='UPGRADE SETTLEMENT',command=self.show_buttons_robber )
-        self.up_settlement.place(in_=self.panel, x=50, y=150)
-        self.end_turn=ttk.Button(self.panel, text='END TURN',command=self.show_buttons_robber )
-        self.end_turn.place(in_=self.panel, x=50, y=250)
-        #self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn)
-
-
-
+        self.place_robber.place(in_=self.panel, x=50, y=50)
 
 
     def setup_map(self):
@@ -519,14 +469,10 @@ class GUI:
         self.robber_image=self.map.create_image(self.board.robber.region.coordinates[0]*self.rescale, self.board.robber.region.coordinates[1]*self.rescale, image = self.robber)
         
 
-    def rowcol(self, event):
-        self.frame["text"] = f"{self.map.canvasx(event.x)} | {self.map.canvasy(event.y)}"
-
-
 
 
     def build_GUI(self):
-       # self.map.bind("<Motion>", self.rowcol)
+
         self.master.mainloop()
 
 
