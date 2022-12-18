@@ -11,7 +11,7 @@ from v3_classes.classes import *
 
 
 
-
+#This is the graphical user interface
 
 class GUI:
     def __init__(self):
@@ -67,6 +67,8 @@ class GUI:
         self.RGB_players={'player1': 'green3', 'player2': 'red', 'player3': 'MediumOrchid2', 'player4': 'DodgerBlue2'}
 
 
+
+    #creating the map when pressing the button 'start game'
     def start_game(self):
         self.start_button.destroy()
         self.board.setup_board()
@@ -84,7 +86,7 @@ class GUI:
 
 
         
- 
+    #moving the robber to a given region
     def move_robber(self,region):
         self.map.move(self.robber_image, (region.coordinates[0]-self.board.robber.region.coordinates[0])*self.rescale, (region.coordinates[1]-self.board.robber.region.coordinates[1])*self.rescale)
         self.board.move_robber(region)
@@ -95,6 +97,8 @@ class GUI:
 
 
 
+
+    #placing settlements, roads and cities were the user clicked on the map
     def place_settlement(self,settlement):
         self.settlement_image=self.game.players[self.game.current_player].image_settlement
         self.game.players[self.game.current_player].buy_settlement(settlement, self.round) #replace with buy settlement method from player
@@ -126,6 +130,10 @@ class GUI:
 
 
 
+
+
+
+
     def place_image_region(self, region):
         self.map.create_image(region.coordinates[0]*self.rescale, region.coordinates[1]*self.rescale, image = self.resource_type[region])
         self.map.create_image(region.coordinates[0]*self.rescale, region.coordinates[1]*self.rescale, image = self.number[region])
@@ -135,6 +143,9 @@ class GUI:
     
 
 
+
+
+    #creating the buttons for settlements and cities (same coordinates since a city is an upgrades settlement) 
     def create_button_vertices(self, settlement, city):
         if city==0:
             self.button_settlement[settlement]=ttk.Button(self.map ,text='set',command=lambda : self.place_settlement(settlement))
@@ -145,12 +156,18 @@ class GUI:
             self.button_city[settlement].place(in_=self.map, x=settlement.coordinates[0]*self.rescale, y=settlement.coordinates[1]*self.rescale+480)
             self.button_city[settlement].place_forget()
 
+    #creating the buttons for roads
     def create_button_edges(self, road):
         self.button_road[road]=ttk.Button(self.map,text='road',command=lambda : self.place_road(road))
         self.button_road[road].place(in_=self.map, x=road.coordinates[0]*self.rescale, y=road.coordinates[1]*self.rescale)
         self.button_road[road].place_forget()
 
 
+
+
+
+
+    #showing the button on each region to move the robber
     def show_buttons_robber(self):
         for region in self.button_robber:
             self.button_robber[region].place(in_=self.map, x=region.coordinates[0]*self.rescale+570, y=region.coordinates[1]*self.rescale+480)
@@ -159,6 +176,8 @@ class GUI:
     
 
 
+    #showing buttons to place settlements, cities and roads after performing some checks (enough resources 
+    # and spot available to build for the current player)
     def show_buttons_settlements(self, round=1):
         self.current_player=self.game.current_player
         if round==0:
@@ -222,6 +241,12 @@ class GUI:
         self.var.set(0)
         self.end_action_button.wait_variable(self.var)
     
+
+
+
+
+
+
     def disable_button(self, *args):
         for button in args:
             button.state(['disabled'])
@@ -242,6 +267,8 @@ class GUI:
     def end_turn(self):
         self.var_end_turn.set(1)
         self.disable_button(self.end_turn_button)
+
+
 
     def action_place_robber(self):
         self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button, self.end_action_button)
@@ -274,6 +301,8 @@ class GUI:
         self.winner.place(in_=self.panel, x=150, y=700)
         self.disable_button(self.place_robber, self.buy_settlement, self.buy_road, self.up_settlement, self.end_turn_button, self.end_action_button)
 
+
+    #creating the buttons for the panel (right part of the window)
     def setup_panel(self):
         self.place_robber=ttk.Button(self.panel, text='MOVE ROBBER',command=self.show_buttons_robber )
         self.place_robber.place(in_=self.panel, x=50, y=200)

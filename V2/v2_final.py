@@ -302,7 +302,6 @@ class Game:
         self.players={}
         for name in ['player1', 'player2', 'player3', 'player4']:
             self.players[name]=Player(name)
-            self.scores=[self.players[player].points for player in self.players]
             self.winning_condition=0
             self.board=board
         self.GUI=GUI

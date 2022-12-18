@@ -15,6 +15,8 @@ class Player:
         self.image_roads=[]
         self.image_settlement=None
         self.images_city=None
+
+        #lists of roads/settlements where the player can build, updated before the corresponding action
         self.available_settlements=[s for s in settlements]
         self.available_roads=[r for r in roads]
 
@@ -62,11 +64,12 @@ class Region:
 
     def __init__(self, id, dice_number, region_type, coordinates):
         self.coordinates=coordinates
-        self.region_type=region_type
-        self.resource_type=self.types_to_resources[str(region_type)]
+        self.region_type=region_type # number form 1 to 6
+        self.resource_type=self.types_to_resources[str(region_type)] #maps the number to a resource
         self.id=id
         self.dice_number=dice_number
-        self.robber=0
+        self.robber=0 #whether the region has a robber on it
+        #dicts of road/settlemment objects on each edge/vertex of the region
         self.vertices={p:  None for p in ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']}
         self.edges={p: None for p in ['e1', 'e2', 'e3', 'e4', 'e5', 'e6']}
 
@@ -107,19 +110,22 @@ class Board:
     def __init__(self):
         
         self.region_position=tuple(range(0, 19))
-        self.region_types=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5]#desert needs to have 7 
+        self.region_types=[1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5]
         random.shuffle(self.region_types)
         self.region_types.append(6)
         #forest=1 (lumber), pasture=2 (wool), fields=3 (grain), hills=4 (brick), mountain=5 (ore), desert=6 (None)
 
+        #setting fixed coordinates for each region potential location
         self.region_coordinates={'1': (-1,-sqrt(3)), '2': (0,-sqrt(3)), '3':(1,-sqrt(3)), '4':(1.5,-sqrt(3/4)), '5': (2,0), '6':(1.5, sqrt(3/4)), '7':(1,sqrt(3)), '8':(0,sqrt(3)), '9':(-1,sqrt(3)), 
                                 '10': (-1.5,sqrt(3/4)), '11': (-2,0), '12': (-1.5,-sqrt(3/4)), '13':(-0.5,-sqrt(3/4)), '14':(0.5,-sqrt(3/4)), '15': (1,0), '16':(0.5,sqrt(3/4)), '17':(-0.5,sqrt(3/4)), 
-                                '18':(-1,0), '19':(0,0)} #change
+                                '18':(-1,0), '19':(0,0)}
 
+        #defining the dice number associated to each region
         self.region_numbering=[('a',5) , ('b',2) , ('c',6), ('d',3), ('e',8), ('f',10), ('g',9), ('h',12), ('i',11), 
                             ('j',4), ('k',8), ('l',10), ('m',9), ('n',4), ('o',5), ('p',6), ('q',3), ('r',11), ('desert',7)]
         self.region_parameter=[(x,y) for x,y in zip(self.region_types,self.region_numbering)]
-        random.shuffle(self.region_parameter)
+        random.shuffle(self.region_parameter)#shuffling the order to have a random board
+
         self.regions=[]
         self.roads=[]
         self.settlements=[]
@@ -129,8 +135,13 @@ class Board:
                                 (0.5,sqrt(3/4)):(('v2', 'v1', 'e1'),('v4', 'v5', 'e4')), 
                                 (-0.5, sqrt(3/4)):(('v6', 'v1', 'e6'),('v4', 'v3', 'e3')), 
                                 (-1,0):(('v6', 'v5', 'e5'),('v2', 'v3', 'e2'))} 
+        #the proximity vector maps for each vector the corresponding shared vertices and edges 
+            
+        #used to calculate the coordinates of vertices and edges when starting from the center of a region
         self.edge_coordinate_mapping={'e1':(0.25, sqrt(3/4)/2),'e2':(1/2, 0), 'e3':(0.25, -sqrt(3/4)/2), 'e4':(-0.25, -sqrt(3/4)/2), 'e5':(-1/2, -0), 'e6':(-0.25, sqrt(3/4)/2)}
         self.vertex_coordinate_mapping={'v1':(0, 1/sqrt(3)),'v2':(1/2, 1/(2*sqrt(3))), 'v3':(1/2, -1/(2*sqrt(3))), 'v4':(0, -1/sqrt(3)), 'v5':(-1/2, -1/(2*sqrt(3))), 'v6':(-1/2, 1/(2*sqrt(3)))}
+        
+        #dicts that give for vertices and edges the corresponding adjacent vertices/edges
         self.connection_vertices_vertices={'v1':('v6', 'v2'),'v2':('v1', 'v3'),'v3':('v2', 'v4'),
                                             'v4':('v3', 'v5'),'v5':('v4', 'v6'),'v6':('v5', 'v1')}
         self.connection_vertices_edges={'v1':('e6', 'e1'),'v2':('e1', 'e2'),'v3':('e2', 'e3'),
@@ -141,20 +152,25 @@ class Board:
                                             'e4':('e3', 'e5'),'e5':('e4', 'e6'),'e6':('e5', 'e1')}
         
 
-        
+
+
+    #This method claculates the vector between each pair of regions in the board.
+    #If the vector is in the keys of the proximity vector, then it creates the corresponding Road and Settlement objects (if not already creates)
+    #The settlement object is created with no owner and a multiplier of 0 (which means nothing has been built on it yet)   
     def setup_roads_settlements(self, region1, region2):
         self.vector=region2.coordinates[0]-region1.coordinates[0], region2.coordinates[1]-region1.coordinates[1]
         if self.vector in self.proximity_vector:
-            if region1.edges[self.proximity_vector[self.vector][0][2]]==None:
-                if region2.edges[self.proximity_vector[self.vector][1][2]]==None:
+            if region1.edges[self.proximity_vector[self.vector][0][2]]==None: # if no Road object on the shared edge in region 1
+                if region2.edges[self.proximity_vector[self.vector][1][2]]==None: # if no Road object on the shared edge in region 2
+                    #creating the Road object
                     region1.edges[self.proximity_vector[self.vector][0][2]]=Road(tuple(np.array(region1.coordinates)+np.array(self.edge_coordinate_mapping[self.proximity_vector[self.vector][0][2]])),region1, region2 )
-                    region2.edges[self.proximity_vector[self.vector][1][2]]=region1.edges[self.proximity_vector[self.vector][0][2]] #adding the already created road to the other region
-                    self.roads.append(region1.edges[self.proximity_vector[self.vector][0][2]]) #adding the newly created road to the list of 
-                else:
+                    region2.edges[self.proximity_vector[self.vector][1][2]]=region1.edges[self.proximity_vector[self.vector][0][2]] #adding the created road to the other region
+                    self.roads.append(region1.edges[self.proximity_vector[self.vector][0][2]]) #adding the created road to the list of roads
+                else:#The Road object already exists in region 2
                     region2.edges[self.proximity_vector[self.vector][1][2]].regions.append(region1) #appending a region id to road.region which is a list containing all regions sharing that edge
-                    region1.edges[self.proximity_vector[self.vector][0][2]]=region2.edges[self.proximity_vector[self.vector][1][2]]
+                    region1.edges[self.proximity_vector[self.vector][0][2]]=region2.edges[self.proximity_vector[self.vector][1][2]] #setting the edge in region 1 equal to the Road object in region 2
         
-
+            #same reasoning for the two vertices shared by two regions
             if region1.vertices[self.proximity_vector[self.vector][0][0]]==None:
                 if region2.vertices[self.proximity_vector[self.vector][1][0]]==None:
                     region1.vertices[self.proximity_vector[self.vector][0][0]]=Settlement(tuple(np.array(region1.coordinates)+np.array(self.vertex_coordinate_mapping[self.proximity_vector[self.vector][0][0]])),region1, region2)
@@ -181,8 +197,10 @@ class Board:
                 region2.vertices[self.proximity_vector[self.vector][1][1]]=region1.vertices[self.proximity_vector[self.vector][0][1]]
 
 
+
     def connections(self): 
         for region in self.regions:
+            #finding the connected vertices and edges to each vertex
             for v in region.vertices:
                 for k in [0,1]:
                     if region.vertices[self.connection_vertices_vertices[v][k]] not in region.vertices[v].connected_settlements:
@@ -190,6 +208,7 @@ class Board:
                     if region.edges[self.connection_vertices_edges[v][k]] not in region.vertices[v].connected_roads:
                         region.vertices[v].connected_roads.append(region.edges[self.connection_vertices_edges[v][k]])
 
+            #finding the connected vertices and edges to each edge
             for v in region.edges:
                 for k in [0,1]:
                     if region.edges[self.connection_edges_edges[v][k]] not in region.edges[v].connected_roads:
@@ -204,6 +223,7 @@ class Board:
 
     def setup_board(self):
 
+        #creating Region objects
         for k in range(0,19):
             self.regions.append(Region(self.region_parameter[k][1][0],self.region_parameter[k][1][1],self.region_parameter[k][0], self.region_coordinates[str(k+1)]))
 
@@ -211,8 +231,8 @@ class Board:
             for j in range(len(self.regions)):
                 self.setup_roads_settlements(self.regions[i],self.regions[j])
 
-                # create outer roads and settlements and assign them to the respective region
 
+        # create outer roads and settlements and assign them to the respective region
         self.k=0
         for p in self.regions:
             for q in self.edge_coordinate_mapping:
@@ -225,19 +245,22 @@ class Board:
                     p.vertices[q]=Settlement(tuple(np.array(p.coordinates)+np.array(self.vertex_coordinate_mapping[q])),p) 
                     self.settlements.append(p.vertices[q])#adding the newly created settlement to the list of settlements
         self.connections()
+
+        #creating the robber object and assigning it to the desert region
         self.robber=Robber()
         for x in self.regions:
             if x.dice_number == 7:
                 self.robber.region=x
                 x.robber=1
 
-    
+    #method to move the robber to a new region
     def move_robber(self, region):
         self.robber.region.robber=0
         self.robber.region=region
         region.robber=1
         
 
+    #updating the list of available settlements for the current player during the round 0 (slightly different constraints)
     def round0_available_settlements(self, player):
         player.available_settlements = self.settlements.copy()
         self.settlements_to_remove=[]
@@ -254,7 +277,7 @@ class Board:
 
                    
 
-
+    #updating the list of available roads for the current player during the round 0
     def round0_available_roads (self, player):
         player.available_roads = self.roads.copy()
         self.roads_to_remove=[]
@@ -268,7 +291,7 @@ class Board:
             
 
 
-
+    #updating the list of available settlements for the current player during normal rounds
     def round_available_settlements (self, player):
         player.available_settlements = self.settlements.copy()
         self.settlements_to_remove=[]
@@ -292,7 +315,7 @@ class Board:
             player.available_settlements.remove(s)
         
 
-
+    #updating the list of available roads for the current player during normal rounds
     def round_available_roads (self, player):
         player.available_roads = self.roads.copy()
         self.roads_to_remove=[]
@@ -315,26 +338,25 @@ class Game:
         self.board=board
         self.players={}
         for name in ['player1', 'player2', 'player3', 'player4']:
-            self.players[name]=Player(name, self.board.settlements, self.board.roads)
-            self.scores=[self.players[player].points for player in self.players]
+            self.players[name]=Player(name, self.board.settlements, self.board.roads) #creating the Player object for each player
             self.winning_condition=0
         self.current_player=None
         self.GUI=GUI
 
 
-    #fix indentation
     def declare_winner(self, current_player):
-        if self.players[current_player].points>5: 
+        if self.players[current_player].points>5: #condition to win, checked at the end of each turn
             return 1
         else:
             return 0
 
     def start_game(self):
-        self.round_zero()
-        self.rounds()
+        self.round_zero() #starting the round 0
+        self.rounds() #doing normal rounds until a player wins
         self.GUI.display_winner(self.current_player)
 
     def round_zero(self):
+        #each player can put 2 settlements and 2 roads, and receive the resources for the 2nd settlement placed
         for player in self.players:
             self.turn_zero(player)
         for player in [player for player in self.players][::-1]:
@@ -351,7 +373,8 @@ class Game:
 
 
     def rounds(self):
-        while self.winning_condition==0:
+        #Normal rounds, infinite loop until a player wins
+        while self.winning_condition==0: 
             for player in self.players:
                 self.turn(player)
                 self.winning_condition=self.declare_winner(player)
@@ -368,15 +391,17 @@ class Game:
 
 
     def turn(self, player):
-        self.current_player=player
+        self.current_player=player #setting current player
         self.GUI.update_player_label()
-        self.dice_result= random.randint(1,6)+random.randint(1,6)
+        self.dice_result= random.randint(1,6)+random.randint(1,6) #throwing dice
         self.GUI.update_dice_roll(self.dice_result)
-        self.give_resources(self.dice_result)
+        self.give_resources(self.dice_result) #give corresponding resources
         self.GUI.update_player_resources()
-        if self.dice_result==7:
+        if self.dice_result==7: # if the dice result is 7, the player has to move the robber
             self.GUI.action_place_robber()
-        self.GUI.other_actions()
+        self.GUI.other_actions() # making available the 'buy road', 'buy settlement' and 'upgrade settlement' buttons
+        #if the player has nowhere to build a given element (failing resources check or empty available roads/settlements/cities lists), 
+        # only the 'end action' button is available
 
     def give_resources_round0(self):
         for player in self.players:
@@ -391,18 +416,21 @@ class Game:
 
     def get_resources_round0(self, settlement):
         for region in set(settlement.regions):
-            if region.resource_type=='desert':
+            if region.resource_type=='desert': #if the region is a desert, it gives no resources
                 continue
             self.players[settlement.owner].resources[region.resource_type]+=1*settlement.multiplier
 
     def get_resources(self, settlement, dice_result):
         for region in set(settlement.regions):
-            if region.resource_type=='desert':
+            if region.resource_type=='desert': #if the region is a desert, it gives no resources
                 continue
-            if region.robber==1:
+            if region.robber==1: #if the robber is on the region, it gives no resources
                 continue
-            if region.dice_number==dice_result:
-                self.players[settlement.owner].resources[region.resource_type]+=1*settlement.multiplier
+            if region.dice_number==dice_result: #only regions having the right dice number giv resources
+                self.players[settlement.owner].resources[region.resource_type]+=1*settlement.multiplier 
+                #giving resources according to the multiplier of the Settlement object (settlement-->1, city-->2)
+
+                
         
       
         
